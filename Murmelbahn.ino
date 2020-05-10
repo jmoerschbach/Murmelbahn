@@ -22,38 +22,15 @@ void loop() {
 //	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
 //		leds[counter] = CRGB::Green;
 //	}
-	leds[0] = CRGB::Green;
-	FastLED.show();
-	delay(500);
-	leds[0] = CRGB::Black;
-	leds[1] = CRGB::Orange;
-	// Now turn the LED off, then pause
-//	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
-//		leds[counter] = CRGB::Black;
-//	}
-	FastLED.show();
-	delay(500);
-	leds[1] = CRGB::Black;
-	leds[2] = CRGB::Green;
-	FastLED.show();
-	delay(500);
-	leds[2] = CRGB::Black;
-	leds[3] = CRGB::Orange;
-	FastLED.show();
-	delay(500);
-	leds[3] = CRGB::Black;
-	leds[4] = CRGB::Green;
-	FastLED.show();
-	delay(500);
-	leds[4] = CRGB::Black;
-	leds[5] = CRGB::Orange;
-	FastLED.show();
-	delay(500);
-	leds[5] = CRGB::Black;
-	leds[6] = CRGB::Green;
-	FastLED.show();
-	delay(500);
-	leds[6] = CRGB::Black;
-	FastLED.show();
+	for (uint16_t dot = 0; dot < NUM_LEDS; ++dot) {
+		if (dot % 2 == 1) {
+			leds[dot] = CRGB::Green;
+		}else{
+			leds[dot] = CRGB::Orange;
+		}
+		FastLED.show();
+		leds[dot] = CRGB::Black;
+		delay(250);
+	}
 
 }
