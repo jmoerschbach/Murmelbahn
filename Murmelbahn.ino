@@ -19,17 +19,41 @@ void setup() {
 
 void loop() {
 	// Turn the LED on, then pause
-	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
-		leds[counter] = CRGB::Green;
-	}
-
+//	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
+//		leds[counter] = CRGB::Green;
+//	}
+	leds[0] = CRGB::Green;
 	FastLED.show();
 	delay(500);
+	leds[0] = CRGB::Black;
+	leds[1] = CRGB::Orange;
 	// Now turn the LED off, then pause
-	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
-		leds[counter] = CRGB::Black;
-	}
+//	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
+//		leds[counter] = CRGB::Black;
+//	}
 	FastLED.show();
 	delay(500);
+	leds[1] = CRGB::Black;
+	leds[2] = CRGB::Green;
+	FastLED.show();
+	delay(500);
+	leds[2] = CRGB::Black;
+	leds[3] = CRGB::Orange;
+	FastLED.show();
+	delay(500);
+	leds[3] = CRGB::Black;
+	leds[4] = CRGB::Green;
+	FastLED.show();
+	delay(500);
+	leds[4] = CRGB::Black;
+	leds[5] = CRGB::Orange;
+	FastLED.show();
+	delay(500);
+	leds[5] = CRGB::Black;
+	leds[6] = CRGB::Green;
+	FastLED.show();
+	delay(500);
+	leds[6] = CRGB::Black;
+	FastLED.show();
 
 }
