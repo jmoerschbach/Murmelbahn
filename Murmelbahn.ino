@@ -11,7 +11,7 @@
 
 // Define the array of leds
 CRGB leds[NUM_LEDS];
-
+uint16_t dot = 0;
 void setup() {
 
 	FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS); // GRB ordering is typical
@@ -22,15 +22,27 @@ void loop() {
 //	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
 //		leds[counter] = CRGB::Green;
 //	}
-	for (uint16_t dot = 0; dot < NUM_LEDS; ++dot) {
-		if (dot % 2 == 1) {
-			leds[dot] = CRGB::Green;
-		}else{
-			leds[dot] = CRGB::Orange;
-		}
+//	for (uint16_t dot = 0; dot < NUM_LEDS; ++dot) {
+//		if (dot & 1) {
+//			leds[dot] = CRGB::Green;
+//		} else {
+//			leds[dot] = CRGB::Orange;
+//		}
+//		FastLED.show();
+//		leds[dot] = CRGB::Black;
+//		delay(250);
+//	}millis()
+
+	EVERY_N_MILLISECONDS(250)
+	{
+		leds[dot] = CRGB::Green;
 		FastLED.show();
 		leds[dot] = CRGB::Black;
-		delay(250);
-	}
+		if (dot < NUM_LEDS) {
+			++dot;
+		} else {
+			dot = 0;
+		}
 
+	}
 }
