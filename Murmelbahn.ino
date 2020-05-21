@@ -33,11 +33,14 @@ void loop() {
 //		delay(250);
 //	}millis()
 
-	EVERY_N_MILLISECONDS(250)
+	EVERY_N_MILLISECONDS(125)
 	{
 		leds[dot] = CRGB::Green;
 		FastLED.show();
-		leds[dot] = CRGB::Black;
+		leds[dot].fadeToBlackBy(192);
+		leds[dot - 1].fadeToBlackBy(192);
+		leds[dot - 2].fadeToBlackBy(192);
+		leds[dot - 3] = CRGB::Black;
 		if (dot < NUM_LEDS) {
 			++dot;
 		} else {
