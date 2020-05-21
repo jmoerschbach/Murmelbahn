@@ -35,12 +35,16 @@ void loop() {
 
 	EVERY_N_MILLISECONDS(125)
 	{
-		leds[dot] = CRGB::Green;
+		if (dot & 1 == 1) {
+			leds[dot] = CHSV(96, 255, 255);
+		} else {
+			leds[dot] = CHSV(160, 255, 255);
+		}
 		FastLED.show();
-		leds[dot].fadeToBlackBy(192);
-		leds[dot - 1].fadeToBlackBy(192);
-		leds[dot - 2].fadeToBlackBy(192);
-		leds[dot - 3] = CRGB::Black;
+		fadeToBlackBy(leds, NUM_LEDS, 155);
+//		for (uint16_t point = 0; point < NUM_LEDS; ++point) {
+//			leds[point].fadeToBlackBy(155);
+//		}
 		if (dot < NUM_LEDS) {
 			++dot;
 		} else {
