@@ -22,8 +22,17 @@ void count_down() {
 	EVERY_N_SECONDS(1)
 	{
 		FastLED.clear();
-		fill_solid(leds_right_post, countdown, CRGB::Yellow);
-		fill_solid(leds_left_post, countdown, CRGB::Yellow);
+		int numLedsToLight = map(countdown, 0, 10, 0, NUM_LEDS_POSTS);
+		CRGB color;
+		if (countdown > 7) {
+			color = CRGB::Red;
+		} else if (countdown > 4) {
+			color = CRGB::Yellow;
+		} else {
+			color = CRGB::Green;
+		}
+		fill_solid(leds_right_post, numLedsToLight, color);
+		fill_solid(leds_left_post, numLedsToLight, color);
 		--countdown;
 		FastLED.show();
 	}
