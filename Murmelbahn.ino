@@ -18,6 +18,7 @@ CRGB leds_right_post[NUM_LEDS_POSTS];
 CRGB leds_left_post[NUM_LEDS_POSTS];
 uint16_t dot = 0;
 uint8_t countdown = 10;
+uint8_t current_state = 0;
 void count_down() {
 	EVERY_N_SECONDS(1)
 	{
@@ -33,8 +34,12 @@ void count_down() {
 		}
 		fill_solid(leds_right_post, numLedsToLight, color);
 		fill_solid(leds_left_post, numLedsToLight, color);
-		--countdown;
+//		--countdown;
 		FastLED.show();
+		if (countdown-- == 0) {
+			dot = 0;
+			current_state = 1;
+		}
 	}
 }
 void moving_marble() {
@@ -58,7 +63,10 @@ void moving_marble() {
 		} else {
 			dot = 0;
 		}
-
+		if (dot >= NUM_LEDS_RAILS) {
+			countdown = 10;
+			current_state = 0;
+		}
 	}
 }
 void setup() {
@@ -74,9 +82,14 @@ void setup() {
 }
 
 void loop() {
-	count_down();
+	if (current_state == 0) {
+		count_down();
+	} else if (current_state == 1) {
+		moving_marble();
+	}
+
 //	moving_marble();
-	// Turn the LED on, then pause
+// Turn the LED on, then pause
 //	for (uint16_t counter = 0; counter < NUM_LEDS; ++counter) {
 //		leds[counter] = CRGB::Green;
 //	}
