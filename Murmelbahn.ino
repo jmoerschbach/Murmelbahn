@@ -12,16 +12,18 @@
 #define DATA_PIN_FRONT_RAIL 6
 #define DATA_PIN_BACK_RAIL 5
 #define BUTTON_PIN 8
+#define MARBLE_SPEED 60
+#define COUNTDOWN_STARTVALUE 10
 // Define the array of leds_front_rail
 CRGB leds_front_rail[NUM_LEDS_RAILS];
 CRGB leds_back_rail[NUM_LEDS_RAILS];
 CRGB leds_right_post[NUM_LEDS_POSTS];
 CRGB leds_left_post[NUM_LEDS_POSTS];
 uint16_t dot = 0;
-uint8_t countdown = 10;
+uint8_t countdown = COUNTDOWN_STARTVALUE;
 uint8_t current_state = 0;
 void fade_out() {
-	EVERY_N_MILLISECONDS(60)
+	EVERY_N_MILLISECONDS(MARBLE_SPEED)
 	{
 		fadeToBlackBy(leds_front_rail, NUM_LEDS_RAILS, 155);
 		fadeToBlackBy(leds_back_rail, NUM_LEDS_RAILS, 155);
@@ -40,7 +42,8 @@ void count_down() {
 	EVERY_N_SECONDS(1)
 	{
 		FastLED.clear();
-		int numLedsToLight = map(countdown, 0, 10, 0, NUM_LEDS_POSTS);
+		int numLedsToLight = map(countdown, 0, COUNTDOWN_STARTVALUE, 0,
+				NUM_LEDS_POSTS);
 		CRGB color;
 		if (countdown > 7) {
 			color = CRGB::Red;
@@ -55,12 +58,13 @@ void count_down() {
 		FastLED.show();
 		if (countdown-- == 0) {
 			dot = 0;
+			countdown = COUNTDOWN_STARTVALUE;
 			current_state = 2;
 		}
 	}
 }
 void moving_marble() {
-	EVERY_N_MILLISECONDS(60)
+	EVERY_N_MILLISECONDS(MARBLE_SPEED)
 	{
 		if (dot & 1 == 1) {
 			leds_front_rail[dot] = CHSV(96, 255, 255);
@@ -81,7 +85,6 @@ void moving_marble() {
 			dot = 0;
 		}
 		if (dot >= NUM_LEDS_RAILS) {
-			countdown = 10;
 			current_state = 3;
 		}
 	}
