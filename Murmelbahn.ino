@@ -21,7 +21,12 @@ CRGB leds_right_post[NUM_LEDS_POSTS];
 CRGB leds_left_post[NUM_LEDS_POSTS];
 uint16_t dot = 0;
 uint8_t countdown = COUNTDOWN_STARTVALUE;
-uint8_t current_state = 0;
+//uint8_t current_state = 0;
+enum State {
+	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT
+};
+State current_state = KNOPF;
+
 void fade_out() {
 	EVERY_N_MILLISECONDS(MARBLE_SPEED)
 	{
@@ -29,13 +34,13 @@ void fade_out() {
 		fadeToBlackBy(leds_back_rail, NUM_LEDS_RAILS, 155);
 		FastLED.show();
 		if (!leds_front_rail[NUM_LEDS_RAILS - 1]) {
-			current_state = 0;
+			current_state = KNOPF;
 		}
 	}
 }
 void button() {
 	if (digitalRead(BUTTON_PIN) == LOW) {
-		current_state = 1;
+		current_state = COUNTDOWN;
 	}
 }
 void count_down() {
@@ -43,7 +48,7 @@ void count_down() {
 	{
 		FastLED.clear();
 		int numLedsToLight = map(countdown, 0, COUNTDOWN_STARTVALUE, 0,
-				NUM_LEDS_POSTS);
+		NUM_LEDS_POSTS);
 		CRGB color;
 		if (countdown > 7) {
 			color = CRGB::Red;
@@ -59,7 +64,7 @@ void count_down() {
 		if (countdown-- == 0) {
 			dot = 0;
 			countdown = COUNTDOWN_STARTVALUE;
-			current_state = 2;
+			current_state = MOVINGMARBLE;
 		}
 	}
 }
@@ -85,7 +90,7 @@ void moving_marble() {
 			dot = 0;
 		}
 		if (dot >= NUM_LEDS_RAILS) {
-			current_state = 3;
+			current_state = FADEOUT;
 		}
 	}
 }
@@ -104,13 +109,13 @@ void setup() {
 }
 
 void loop() {
-	if (current_state == 0) {
+	if (current_state == KNOPF) {
 		button();
-	} else if (current_state == 1) {
+	} else if (current_state == COUNTDOWN) {
 		count_down();
-	} else if (current_state == 2) {
+	} else if (current_state == MOVINGMARBLE) {
 		moving_marble();
-	} else if (current_state == 3) {
+	} else if (current_state == FADEOUT) {
 		fade_out();
 	}
 
