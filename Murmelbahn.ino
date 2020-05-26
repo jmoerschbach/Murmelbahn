@@ -21,6 +21,8 @@ CRGB leds_right_post[NUM_LEDS_POSTS];
 CRGB leds_left_post[NUM_LEDS_POSTS];
 uint16_t dot = 0;
 uint8_t countdown = COUNTDOWN_STARTVALUE;
+uint8_t hue_delta = 5;
+uint8_t hue_initial = 0;
 //uint8_t current_state = 0;
 enum State {
 	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT
@@ -39,6 +41,15 @@ void fade_out() {
 	}
 }
 void button() {
+	EVERY_N_MILLISECONDS(100) {
+//		for (uint8_t rainbow = 0; rainbow < NUM_LEDS_POSTS; ++rainbow) {
+////		leds_left_post[rainbow].
+//		}
+		fill_rainbow(leds_left_post, NUM_LEDS_POSTS, hue_initial++, hue_delta);
+		fill_rainbow(leds_right_post, NUM_LEDS_POSTS, hue_initial++,
+				-hue_delta);
+		FastLED.show();
+	}
 	if (digitalRead(BUTTON_PIN) == LOW) {
 		current_state = COUNTDOWN;
 	}
@@ -59,7 +70,6 @@ void count_down() {
 		}
 		fill_solid(leds_right_post, numLedsToLight, color);
 		fill_solid(leds_left_post, numLedsToLight, color);
-//		--countdown;
 		FastLED.show();
 		if (countdown-- == 0) {
 			dot = 0;
@@ -81,9 +91,6 @@ void moving_marble() {
 		FastLED.show();
 		fadeToBlackBy(leds_front_rail, NUM_LEDS_RAILS, 155);
 		fadeToBlackBy(leds_back_rail, NUM_LEDS_RAILS, 155);
-		//		for (uint16_t point = 0; point < NUM_LEDS; ++point) {
-		//			leds[point].fadeToBlackBy(155);
-		//		}
 		if (dot < NUM_LEDS_RAILS) {
 			++dot;
 		} else {
@@ -106,6 +113,8 @@ void setup() {
 	NUM_LEDS_POSTS); // GRB ordering is typical
 	pinMode(BUTTON_PIN, INPUT_PULLUP);
 	FastLED.clear(true);
+//	fill_rainbow(leds_left_post, NUM_LEDS_POSTS, 0, hue_delta);
+	FastLED.show();
 }
 
 void loop() {
