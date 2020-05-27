@@ -20,9 +20,14 @@ CRGB leds_back_rail[NUM_LEDS_RAILS];
 CRGB leds_right_post[NUM_LEDS_POSTS];
 CRGB leds_left_post[NUM_LEDS_POSTS];
 uint16_t dot = 0;
+uint16_t dot_post = 0;
 uint8_t countdown = COUNTDOWN_STARTVALUE;
 uint8_t hue_delta = 5;
 uint8_t hue_initial = 0;
+uint8_t hue = 0;
+
+boolean direction = false;
+
 //uint8_t current_state = 0;
 enum State {
 	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT
@@ -36,22 +41,71 @@ void fade_out() {
 		fadeToBlackBy(leds_back_rail, NUM_LEDS_RAILS, 155);
 		FastLED.show();
 		if (!leds_front_rail[NUM_LEDS_RAILS - 1]) {
+			dot = 0;
 			current_state = KNOPF;
 		}
 	}
 }
-void button() {
-	EVERY_N_MILLISECONDS(100) {
-//		for (uint8_t rainbow = 0; rainbow < NUM_LEDS_POSTS; ++rainbow) {
-////		leds_left_post[rainbow].
+//void button() {
+//	EVERY_N_MILLISECONDS(100) {
+////		for (uint8_t rainbow = 0; rainbow < NUM_LEDS_POSTS; ++rainbow) {
+//////		leds_left_post[rainbow].
+////		}
+//		fill_rainbow(leds_left_post, NUM_LEDS_POSTS, hue_initial++, hue_delta);
+//		fill_rainbow(leds_right_post, NUM_LEDS_POSTS, hue_initial++,
+//				-hue_delta);
+//		FastLED.show();
+//	}
+//	if (digitalRead(BUTTON_PIN) == LOW) {
+//		current_state = COUNTDOWN;
+//	}
+//}
+//void animation1() {
+//	EVERY_N_MILLISECONDS(MARBLE_SPEED)
+//	{
+//		//		for (uint8_t rainbow = 0; rainbow < NUM_LEDS_POSTS; ++rainbow) {
+//		////		leds_left_post[rainbow].
+//		//		}
+//		if (dot++ >= NUM_LEDS_RAILS) {
+//			dot = 0;
 //		}
-		fill_rainbow(leds_left_post, NUM_LEDS_POSTS, hue_initial++, hue_delta);
-		fill_rainbow(leds_right_post, NUM_LEDS_POSTS, hue_initial++,
-				-hue_delta);
+//		leds_front_rail[dot] = CHSV(++hue, 255, 255);
+//		leds_back_rail[NUM_LEDS_RAILS - dot] = CHSV(255 - hue, 255, 255);
+//		fadeToBlackBy(leds_back_rail, NUM_LEDS_RAILS, 50);
+//		fadeToBlackBy(leds_front_rail, NUM_LEDS_RAILS, 50);
+//
+//		if (dot_post++ >= NUM_LEDS_POSTS) {
+//			dot_post = 0;
+//			direction = !direction;
+//		}
+//		leds_left_post[dot_post] = CHSV(++hue, 255, 255);
+//		leds_right_post[NUM_LEDS_POSTS - dot_post] = CHSV(255 - hue, 255, 255);
+//
+//		fadeToBlackBy(leds_left_post, NUM_LEDS_POSTS, 50);
+//		fadeToBlackBy(leds_right_post, NUM_LEDS_POSTS, 50);
+//		FastLED.show();
+//	}
+//}
+
+void button() {
+	EVERY_N_MILLISECONDS(250) {
+		leds_front_rail[dot] = CHSV(hue, 255, 255);
+		leds_back_rail[NUM_LEDS_RAILS - dot] = CHSV(hue, 255, 255);
+		FastLED.show();
+		if (dot < NUM_LEDS_RAILS) {
+			++dot;
+		} else {
+			dot = 0;
+		}
+	}
+	EVERY_N_MILLISECONDS(MARBLE_SPEED/2) {
+		fill_rainbow(leds_left_post, NUM_LEDS_POSTS, ++hue, 5);
+		fill_rainbow(leds_right_post, NUM_LEDS_POSTS, 96 - hue, 5);
 		FastLED.show();
 	}
 	if (digitalRead(BUTTON_PIN) == LOW) {
 		current_state = COUNTDOWN;
+		countdown = COUNTDOWN_STARTVALUE;
 	}
 }
 void count_down() {
