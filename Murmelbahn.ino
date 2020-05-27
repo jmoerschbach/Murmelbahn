@@ -30,7 +30,7 @@ boolean direction = false;
 
 //uint8_t current_state = 0;
 enum State {
-	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT
+	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT, WAIT
 };
 State current_state = KNOPF;
 
@@ -108,8 +108,13 @@ void button() {
 		countdown = COUNTDOWN_STARTVALUE;
 	}
 }
+
+void wait() {
+	delay(900);
+	current_state = MOVINGMARBLE;
+}
 void count_down() {
-	EVERY_N_SECONDS(1)
+	EVERY_N_MILLISECONDS(1100)
 	{
 		FastLED.clear();
 		int numLedsToLight = map(countdown, 0, COUNTDOWN_STARTVALUE, 0,
@@ -128,7 +133,7 @@ void count_down() {
 		if (countdown-- == 0) {
 			dot = 0;
 			countdown = COUNTDOWN_STARTVALUE;
-			current_state = MOVINGMARBLE;
+			current_state = WAIT;
 		}
 	}
 }
@@ -174,6 +179,8 @@ void setup() {
 void loop() {
 	if (current_state == KNOPF) {
 		button();
+	} else if (current_state == WAIT) {
+		wait();
 	} else if (current_state == COUNTDOWN) {
 		count_down();
 	} else if (current_state == MOVINGMARBLE) {
