@@ -12,8 +12,9 @@
 #define DATA_PIN_FRONT_RAIL 6
 #define DATA_PIN_BACK_RAIL 5
 #define BUTTON_PIN 8
-#define MARBLE_SPEED 60
+#define MARBLE_SPEED 58
 #define COUNTDOWN_STARTVALUE 10
+#define BRIGHTNESS 50
 // Define the array of leds_front_rail
 CRGB leds_front_rail[NUM_LEDS_RAILS];
 CRGB leds_back_rail[NUM_LEDS_RAILS];
@@ -30,7 +31,7 @@ boolean direction = false;
 
 //uint8_t current_state = 0;
 enum State {
-	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT, WAIT
+	KNOPF, COUNTDOWN, MOVINGMARBLE, FADEOUT, WAIT, BLINK
 };
 State current_state = KNOPF;
 
@@ -42,7 +43,7 @@ void fade_out() {
 		FastLED.show();
 		if (!leds_front_rail[NUM_LEDS_RAILS - 1]) {
 			dot = 0;
-			current_state = KNOPF;
+			current_state = BLINK;
 		}
 	}
 }
@@ -86,6 +87,18 @@ void fade_out() {
 //		FastLED.show();
 //	}
 //}
+void blink_blink() {
+	for (uint8_t i = 0; i < 2; ++i) {
+		fill_solid(leds_left_post, NUM_LEDS_POSTS, CHSV(55, 255, 255));
+		fill_solid(leds_right_post, NUM_LEDS_POSTS, CHSV(55, 255, 255));
+		FastLED.show();
+		delay(200);
+		FastLED.clear(true);
+		delay(200);
+	}
+	delay(100);
+	current_state = KNOPF;
+}
 
 void button() {
 	EVERY_N_MILLISECONDS(250) {
@@ -171,6 +184,7 @@ void setup() {
 	FastLED.addLeds<WS2812B, DATA_PIN_LEFT_POST, GRB>(leds_left_post,
 	NUM_LEDS_POSTS); // GRB ordering is typical
 	pinMode(BUTTON_PIN, INPUT_PULLUP);
+	FastLED.setBrightness(BRIGHTNESS);
 	FastLED.clear(true);
 //	fill_rainbow(leds_left_post, NUM_LEDS_POSTS, 0, hue_delta);
 	FastLED.show();
@@ -187,6 +201,8 @@ void loop() {
 		moving_marble();
 	} else if (current_state == FADEOUT) {
 		fade_out();
+	} else if (current_state == BLINK) {
+		blink_blink();
 	}
 
 //	moving_marble();
