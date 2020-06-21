@@ -7,12 +7,14 @@
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
 // ground, and power), like the LPD8806 define both DATA_PIN and CLOCK_PIN
 // Clock pin only needed for SPI based chipsets when not using hardware SPI
-#define DATA_PIN_RIGHT_POST 7
-#define DATA_PIN_LEFT_POST 4
-#define DATA_PIN_FRONT_RAIL 6
-#define DATA_PIN_BACK_RAIL 5
-#define BUTTON_PIN 8
+#define DATA_PIN_RIGHT_POST 8
+#define DATA_PIN_LEFT_POST 6
+#define DATA_PIN_FRONT_RAIL 12
+#define DATA_PIN_BACK_RAIL 10
+#define BUTTON_PIN 4
 #define MARBLE_SPEED 58
+#define MAX_NUMBER_OF_MARBLES 3
+#define NOT_USED NUM_LEDS_RAILS+1
 #define COUNTDOWN_STARTVALUE 10
 #define BRIGHTNESS 50
 // Define the array of leds_front_rail
@@ -20,6 +22,7 @@ CRGB leds_front_rail[NUM_LEDS_RAILS];
 CRGB leds_back_rail[NUM_LEDS_RAILS];
 CRGB leds_right_post[NUM_LEDS_POSTS];
 CRGB leds_left_post[NUM_LEDS_POSTS];
+uint8_t dots[MAX_NUMBER_OF_MARBLES];
 uint16_t dot = 0;
 uint16_t dot_post = 0;
 uint8_t countdown = COUNTDOWN_STARTVALUE;
@@ -126,6 +129,24 @@ void wait() {
 	delay(900);
 	current_state = MOVINGMARBLE;
 }
+
+void activate_new_marble() {
+
+	for (uint8_t i = 0; i < MAX_NUMBER_OF_MARBLES; i++) {
+		if (dots[i] == NOT_USED) {
+			dots[i] = 0;
+			break;
+		}
+	}
+}
+boolean no_active_marbles_anymore() {
+	for (uint8_t i = 0; i < MAX_NUMBER_OF_MARBLES; ++i) {
+		if (dots[i] != NOT_USED) {
+			return false;
+		}
+	}
+	return true;
+}
 void count_down() {
 	EVERY_N_MILLISECONDS(1100)
 	{
@@ -144,33 +165,59 @@ void count_down() {
 		fill_solid(leds_left_post, numLedsToLight, color);
 		FastLED.show();
 		if (countdown-- == 0) {
-			dot = 0;
+//			dot = 0;
+			activate_new_marble();
 			countdown = COUNTDOWN_STARTVALUE;
 			current_state = WAIT;
 		}
 	}
 }
 void moving_marble() {
-	EVERY_N_MILLISECONDS(MARBLE_SPEED)
-	{
-		if (dot & 1 == 1) {
-			leds_front_rail[dot] = CHSV(96, 255, 255);
-			leds_back_rail[dot] = CHSV(96, 255, 255);
-		} else {
-			leds_front_rail[dot] = CHSV(160, 255, 255);
-			leds_back_rail[dot] = CHSV(160, 255, 255);
+	if (digitalRead(BUTTON_PIN) == LOW) {
+		activate_new_marble();
+	}
+	EVERY_N_MILLISECONDS(MARBLE_SPEED) {
+		for (uint8_t i = 0; i < MAX_NUMBER_OF_MARBLES; ++i) {
+			if (dots[i] != NOT_USED) {
+				if (dots[i] & 1 == 1) {
+					leds_front_rail[dots[i]] = CHSV(96, 255, 255);
+					leds_back_rail[dots[i]] = CHSV(96, 255, 255);
+				} else {
+					leds_front_rail[dots[i]] = CHSV(160, 255, 255);
+					leds_back_rail[dots[i]] = CHSV(160, 255, 255);
+				}
+			}
 		}
+//		if (dot & 1 == 1) {
+//			leds_front_rail[dot] = CHSV(96, 255, 255);
+//			leds_back_rail[dot] = CHSV(96, 255, 255);
+//		} else {
+//			leds_front_rail[dot] = CHSV(160, 255, 255);
+//			leds_back_rail[dot] = CHSV(160, 255, 255);
+//		}
 		FastLED.show();
 		fadeToBlackBy(leds_front_rail, NUM_LEDS_RAILS, 155);
 		fadeToBlackBy(leds_back_rail, NUM_LEDS_RAILS, 155);
-		if (dot < NUM_LEDS_RAILS) {
-			++dot;
-		} else {
-			dot = 0;
+		for (uint8_t i = 0; i < MAX_NUMBER_OF_MARBLES; ++i) {
+			if (dots[i] != NOT_USED) {
+				dots[i] = dots[i] + 1;
+				if (dots[i] >= NUM_LEDS_RAILS) {
+					dots[i] = NOT_USED;
+				}
+			}
 		}
-		if (dot >= NUM_LEDS_RAILS) {
-			current_state = FADEOUT;
-		}
+//		if (dot < NUM_LEDS_RAILS) {
+//			++dot;
+//		} else {
+//			dot = 0;
+//		}
+//		if (dot >= NUM_LEDS_RAILS) {
+//			current_state = FADEOUT;
+//		}
+	}
+
+	if (no_active_marbles_anymore()) {
+		current_state = FADEOUT;
 	}
 }
 void setup() {
@@ -188,6 +235,10 @@ void setup() {
 	FastLED.clear(true);
 //	fill_rainbow(leds_left_post, NUM_LEDS_POSTS, 0, hue_delta);
 	FastLED.show();
+
+	for (uint8_t i = 0; i < MAX_NUMBER_OF_MARBLES; ++i) {
+		dots[i] = NOT_USED;
+	}
 }
 
 void loop() {
